@@ -1,6 +1,8 @@
-FROM node:18
-WORKDIR /app
-COPY . .
-RUN npm install
-EXPOSE 5500
-CMD ["node", "server.js"]
+# Use lightweight Nginx image
+FROM nginx:alpine
+
+# Copy your static site into Nginx HTML folder
+COPY . /usr/share/nginx/html
+
+# Expose Nginx default port
+EXPOSE 80
