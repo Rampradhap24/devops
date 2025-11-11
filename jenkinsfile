@@ -1,0 +1,55 @@
+pipeline {
+    agent any
+
+    environment {
+        IMAGE_NAME = "devops-practice"
+        CONTAINER_NAME = "devops-container"
+        HOST_PORT = "5500"   // 👈 Host port you want to use
+        CONTAINER_PORT = "80" // 👈 Internal Nginx port
+    }
+
+    triggers {
+        githubPush()  // Auto-trigger on GitHub push
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/Rampradhap24/devops-practice.git'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    echo "🛠️ Building Docker image..."
+                    sh 'docker build -t $IMAGE_NAME .'
+                }
+            }
+        }
+
+        stage('Restart Container') {
+            steps {
+                script {
+                    echo "♻️ Restarting container on port ${HOST_PORT}..."
+                    sh '''
+                    if [ "$(docker ps -q -f name=$CONTAINER_NAME)" ]; then
+                        docker stop $CONTAINER_NAME
+                        docker rm $CONTAINER_NAME
+                    fi
+                    docker run -d -p ${HOST_PORT}:${CONTAINER_PORT} --name $CONTAINER_NAME $IMAGE_NAME
+                    '''
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "✅ Deployment successful! Visit: http://<jenkins-server-ip>:${HOST_PORT}"
+        }
+        failure {
+            echo "❌ Deployment failed!"
+        }
+    }
+}
