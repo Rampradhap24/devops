@@ -15,7 +15,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/Rampradhap24/devops-practice.git'
+                git branch: 'main', url: 'https://github.com/Rampradhap24/devops.git'
             }
         }
 
