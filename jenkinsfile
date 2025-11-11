@@ -2,14 +2,14 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "devops-practice"
+        IMAGE_NAME = "devops"
         CONTAINER_NAME = "devops-container"
-        HOST_PORT = "5500"   // 👈 Host port you want to use
-        CONTAINER_PORT = "81" // 👈 Internal Nginx port
+        HOST_PORT = "5500"       // Browser access port
+        CONTAINER_PORT = "80"    // Inside container (nginx default)
     }
 
     triggers {
-        githubPush()  // Auto-trigger on GitHub push
+        githubPush()  // Automatically run when code changes are pushed
     }
 
     stages {
@@ -46,7 +46,7 @@ pipeline {
 
     post {
         success {
-            echo "✅ Deployment successful! Visit: http://<jenkins-server-ip>:${HOST_PORT}"
+            echo "✅ Deployment successful! Open: http://<jenkins-server-ip>:${HOST_PORT}"
         }
         failure {
             echo "❌ Deployment failed!"
