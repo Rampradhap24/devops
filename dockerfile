@@ -1,8 +1,6 @@
-# Use nginx as the base image
-FROM nginx:alpine
-
-# Copy all your web files to Nginx's default html directory
-COPY . /usr/share/nginx/html
-
-# Expose container port 80 (inside Docker)
-EXPOSE 80
+FROM node:18
+WORKDIR /app
+COPY . .
+RUN npm install
+EXPOSE 5500
+CMD ["node", "server.js"]

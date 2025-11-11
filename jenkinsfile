@@ -2,47 +2,42 @@ pipeline {
     agent any
 
     environment {
-        PATH = "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
-        IMAGE_NAME = "devops"
-        CONTAINER_NAME = "devops-container"
-        HOST_PORT = "5500"
-        CONTAINER_PORT = "80"
+        APP_NAME = "myapp"
+        DOCKER_IMAGE = "myapp:latest"
     }
 
     stages {
-        stage('Checkout') {
+        stage('Clone Repo') {
             steps {
-                git branch: 'main', url: 'https://github.com/Rampradhap24/devops.git'
+                echo "Cloning repository..."
+                git 'https://github.com/Rampradhap24/devops.git'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t $IMAGE_NAME .'
+                echo "Building Docker image..."
+                sh 'docker build -t $DOCKER_IMAGE .'
             }
         }
 
-        stage('Restart Container') {
+        stage('Run Docker Container') {
             steps {
-                script {
-                    sh '''
-                    if [ "$(docker ps -q -f name=$CONTAINER_NAME)" ]; then
-                        docker stop $CONTAINER_NAME
-                        docker rm $CONTAINER_NAME
-                    fi
-                    docker run -d -p ${HOST_PORT}:${CONTAINER_PORT} --name $CONTAINER_NAME $IMAGE_NAME
-                    '''
-                }
+                echo "Running Docker container on port 5500..."
+                sh '''
+                docker rm -f $APP_NAME || true
+                docker run -d -p 5500:5500 --name $APP_NAME $DOCKER_IMAGE
+                '''
             }
         }
     }
 
     post {
         success {
-            echo "✅ Deployment successful! Visit: http://localhost:${HOST_PORT}"
+            echo "✅ Application is running locally on http://localhost:5500"
         }
         failure {
-            echo "❌ Deployment failed!"
+            echo "❌ Build or container run failed!"
         }
     }
 }
