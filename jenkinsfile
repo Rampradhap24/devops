@@ -5,7 +5,7 @@ pipeline {
         IMAGE_NAME = "devops-practice"
         CONTAINER_NAME = "devops-container"
         HOST_PORT = "5500"   // 👈 Host port you want to use
-        CONTAINER_PORT = "80" // 👈 Internal Nginx port
+        CONTAINER_PORT = "81" // 👈 Internal Nginx port
     }
 
     triggers {
