@@ -1,13 +1,8 @@
 pipeline {
     agent any
 
-    environment {
-        APP_NAME = "html-site"
-        DOCKER_IMAGE = "html-site:latest"
-    }
-
     stages {
-        stage('Clone Repo') {
+        stage('Checkout') {
             steps {
                 echo "Cloning repository..."
                 git branch: 'main', url: 'https://github.com/Rampradhap24/devops.git'
@@ -16,28 +11,31 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                echo "Building Docker image..."
-                sh 'docker build -t $DOCKER_IMAGE .'
+                script {
+                    echo "Building Docker image..."
+                    docker.build("devops-app")
+                }
             }
         }
 
-        stage('Run Docker Container') {
+        stage('Run Container') {
             steps {
-                echo "Running container on port 5500..."
-                sh '''
-                docker rm -f $APP_NAME || true
-                docker run -d -p 5500:80 --name $APP_NAME $DOCKER_IMAGE
-                '''
+                script {
+                    echo "Running container on port 5500..."
+                    sh 'docker stop devops-container || true'
+                    sh 'docker rm devops-container || true'
+                    sh 'docker run -d -p 5500:5500 --name devops-container devops-app'
+                }
             }
         }
     }
 
     post {
         success {
-            echo "✅ Static website running locally on http://localhost:5500"
+            echo "✅ Application running successfully at http://localhost:5500"
         }
         failure {
-            echo "❌ Build or run failed!"
+            echo "❌ Build or container run failed. Check console output."
         }
     }
 }

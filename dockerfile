@@ -1,8 +1,18 @@
-# Use lightweight Nginx image
-FROM nginx:alpine
+# Use Node.js base image
+FROM node:18
 
-# Copy your static site into Nginx HTML folder
-COPY . /usr/share/nginx/html
+# Set working directory
+WORKDIR /app
 
-# Expose Nginx default port
-EXPOSE 80
+# Copy package files and install dependencies
+COPY package*.json ./
+RUN npm install
+
+# Copy the rest of the app
+COPY . .
+
+# Expose port 5500
+EXPOSE 5500
+
+# Start the server
+CMD ["node", "server.js"]
